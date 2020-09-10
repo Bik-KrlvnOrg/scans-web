@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  benefit-svc:
+    container_name: scans-benefit
+    build:
+      context: .
+    image: "scans-benefit:latest"
+    networks:
+      - benefit-svc
+    expose: 
+      - "5061"
+    environment:
+      BENEFIT_SVC_URL: "0.0.0.0:5061"
+      DATABASE_HOST: benefit-db
+
+  benefit-db:
+    container_name: "benefit-svc-db"
+    image: "postgres:9.6"
+    networks:
+      - benefit-svc
+    ports:
+      - ${DATABASE_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_DB}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+
+networks:
+  benefit-svc:

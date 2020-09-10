@@ -1,0 +1,98 @@
+syntax = "proto2";
+package io.scans.srv.benefit;
+
+// #region PREMIUM
+
+service PremiumService {
+  rpc ListPremiums(FindPremiumsRequest) returns (ListPremiumsResponse);
+
+  rpc GetPremium(GetPremiumRequest) returns (Premium);
+
+  rpc CreatePremium(CreatePremiumRequest) returns (PremiumSuccessResponse);
+
+  rpc CreatePremiumRate(CreateRateRequest) returns (PremiumSuccessResponse);
+
+  rpc UpdatePremium(UpdatePremiumRequest) returns (PremiumSuccessResponse);
+
+  rpc DeletePremium(DeletePremiumRequest) returns (PremiumSuccessResponse);
+
+}
+
+message Premium {
+   optional string id = 1;
+   required string name = 2;
+   required string description = 3;
+   repeated Rate rates = 4;
+   required double limit = 5;
+}
+
+message Rate {
+  optional string id = 1;
+  required string characteristics = 2;
+  required double value = 3;
+  optional Premium premium = 4;
+}
+
+message CreateRateRequest {repeated Rate rates = 1;}
+
+message PremiumSuccessResponse {required bool success = 1;}
+
+message FindPremiumsRequest {}
+
+message ListPremiumsResponse { repeated Premium premiums = 1;}
+
+message GetPremiumRequest {required string id = 1;}
+
+message CreatePremiumRequest {required Premium premium = 1;}
+
+message UpdatePremiumRequest {required Premium premium = 1;}
+
+message DeletePremiumRequest {required string id = 1;}
+
+// endregion
+
+// #region COVER
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service CoverService {
+  rpc ListCovers(ListCoversRequest) returns (ListCoversResponse);
+
+  rpc GetCover(GetCoverRequest) returns (Cover) ;
+
+  rpc CreateCover(CreateCoverRequest) returns (Cover);
+
+  rpc UpdateCover(UpdateCoverRequest) returns (CoverSuccessResponse) ;
+
+  rpc DeleteCover(DeleteCoverRequest) returns (CoverSuccessResponse);
+
+}
+
+enum PatientType{
+  OUT_PATIENT = 0;
+  IN_PATIENT = 1;
+}
+
+message Cover {
+  optional string id = 1;
+  required string name = 2;
+  required string description = 3;
+  required double amount = 4;
+  optional string coverage = 5;
+  required PatientType patientType = 6 [default = OUT_PATIENT];
+  optional Premium premium = 7;
+}
+
+message CoverSuccessResponse {required bool success = 1;}
+
+message ListCoversRequest { }
+
+message ListCoversResponse {repeated Cover covers = 1;}
+
+message GetCoverRequest {optional string id = 1;}
+
+message CreateCoverRequest {required Cover cover = 1;}
+
+message UpdateCoverRequest {required Cover cover = 1;}
+
+message DeleteCoverRequest {required string id = 1;}
+
+// endregion
