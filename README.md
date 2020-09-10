@@ -5,6 +5,7 @@ gateway
 
 ## Microservices
 * register-svc
+* benefit-svc
 
 ## Database
 * Postgres
@@ -15,7 +16,7 @@ _proto
 ## Requirement
 ## Docker
 ```console
-yarn docker:start
+yarn start
 ```
 
 ## Run
