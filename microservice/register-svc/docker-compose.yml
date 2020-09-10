@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  register-svc:
+    container_name: "scans-register-svc"
+    build: 
+      context: .
+    image: "scans-register-svc:latest"
+    networks:
+       - register-svc
+    ports:
+      - 5051:5051
+    restart: always
+
+    depends_on: 
+      - register-db
+    environment: 
+      DATABASE_HOST: register-db
+      REGISTER_SVC_URL: "0.0.0.0:5051"
+
+  register-db:
+    container_name: "register-svc-db"
+    image: "postgres:9.6"
+    networks:
+      - register-svc
+    ports:
+      - ${DATABASE_PORT}:5432
+    environment: 
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_DB}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+
+networks:
+  register-svc:

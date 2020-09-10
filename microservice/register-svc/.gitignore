@@ -1,0 +1,5 @@
+node_modules
+pgdata
+.env
+dist
+yarn-error.log

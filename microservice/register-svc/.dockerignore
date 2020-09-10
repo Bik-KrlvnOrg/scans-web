@@ -1,0 +1,9 @@
+node_modules
+dist
+test
+.env.example
+.gitignore
+yarn-error.log
+pgdata
+.dockerignore
+Dockerfile
