@@ -6,13 +6,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MedicalRepository } from './repository/medical.repository';
 import { CreateMedicalHandler, DeleteMedicalHandler, UpdateMedicalHandler } from './command';
 import { MedicalCreatedHandler, MedicalDeletedHandler, MedicalUpdatedHandler } from './event';
-import { GetMedicalsHandler } from './query';
+import { GetMedicalsHandler, GetMedicalHandler } from './query';
 import { CheckEntityService } from 'src/libs/service';
 
 
 const CommandHandlers = [CreateMedicalHandler, DeleteMedicalHandler, UpdateMedicalHandler]
 const EventHandlers = [MedicalCreatedHandler, MedicalDeletedHandler, MedicalUpdatedHandler]
-const QueryHandlers = [GetMedicalsHandler]
+const QueryHandlers = [GetMedicalsHandler,GetMedicalHandler]
 
 @Module({
   imports: [

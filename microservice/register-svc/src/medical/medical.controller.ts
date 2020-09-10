@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
 import { MedicalService } from './medical.service';
 import { GrpcMethod } from '@nestjs/microservices'
-import { CreateMedicalRequest, FindMedialsRequest, ListMedicalResponse, MedicalSuccessResponse, UpdateMedicalRequest } from 'src/_proto/register';
+import { CreateMedicalRequest, MedicalSuccessResponse, UpdateMedicalRequest, DeleteMedicalRequest, ListMedicalsRequest, ListMedicalsResponse, GetMedicalRequest } from 'src/_proto/register';
 
 @Controller('medical')
 export class MedicalController {
@@ -10,23 +10,28 @@ export class MedicalController {
     ) { }
     logger = new Logger(this.constructor.name)
 
-    @GrpcMethod('MedicalService', 'createMedical')
-    async CreateMedical(data: CreateMedicalRequest, _ctx: any): Promise<MedicalSuccessResponse> {
-        return await this.medicalService.createMedical(data)
+    @GrpcMethod('MedicalService', 'CreateMedical')
+    async CreateMedical(req: CreateMedicalRequest, _ctx: any): Promise<MedicalSuccessResponse> {
+        return await this.medicalService.createMedical(req.medicals)
     }
 
-    @GrpcMethod('MedicalService', 'getMedicals')
-    async getMedicals(data: FindMedialsRequest): Promise<ListMedicalResponse> {
-        return await this.medicalService.getMedicals(data);
+    @GrpcMethod('MedicalService', 'ListMedicals')
+    async getMedicals(req: ListMedicalsRequest): Promise<ListMedicalsResponse> {
+        return await this.medicalService.getMedicals(req);
     }
 
-    @GrpcMethod('MedicalService', 'deleteMedical')
-    async removeMedical(data: FindMedialsRequest, _ctx: any): Promise<MedicalSuccessResponse> {
-        return await this.medicalService.removeMedical(data)
+    @GrpcMethod('MedicalService', 'GetMedical')
+    async getMedical(req: GetMedicalRequest): Promise<ListMedicalsResponse> {
+        return await this.medicalService.getMedical(req.id);
     }
 
-    @GrpcMethod('MedicalService', 'updateMedical')
-    async updateMedical(data: UpdateMedicalRequest, _ctx: any): Promise<MedicalSuccessResponse> {
-        return await this.medicalService.updateMedical(data)
+    @GrpcMethod('MedicalService', 'DeleteMedical')
+    async removeMedical(req: DeleteMedicalRequest, _ctx: any): Promise<MedicalSuccessResponse> {
+        return await this.medicalService.removeMedical(req.id)
+    }
+
+    @GrpcMethod('MedicalService', 'UpdateMedical')
+    async updateMedical(req: UpdateMedicalRequest, _ctx: any): Promise<MedicalSuccessResponse> {
+        return await this.medicalService.updateMedical(req.medical)
     }
 }

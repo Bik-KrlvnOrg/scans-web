@@ -1,102 +1,109 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package io.scans.srv.register;
 
+//region REGISTER
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
 service RegisterService {
-  rpc createRegister(CreateRegisterRequest) returns (RegisterResponse);
+  rpc ListRegisters(ListRegistersRequest) returns (ListRegistersResponse);
+
+  rpc GetRegister(GetRegisterRequest) returns (Register);
+
+  rpc CreateRegister(CreateRegisterRequest) returns (RegisterSuccessResponse);
+
+  rpc UpdateRegister(UpdateRegisterRequest) returns (RegisterSuccessResponse);
+
+  rpc DeleteRegister(DeleteRegisterRequest) returns (RegisterSuccessResponse);
 }
-
-
-service MedicalService {
-    rpc createMedical(CreateMedicalRequest) returns (MedicalSuccessResponse);
-    rpc getMedicals (FindMedialsRequest) returns (ListMedicalResponse);
-    rpc deleteMedical (FindMedialsRequest) returns (MedicalSuccessResponse);
-    rpc updateMedical (UpdateMedicalRequest) returns (MedicalSuccessResponse);
-}
-
-message CreateMedicalRequest {
-    repeated MedicalInput medicals = 1;
-}
-
-message UpdateMedicalRequest {
-    string id = 1;
-    string name = 2;
-    string value = 3;
-}
-
-message MedicalSuccessResponse {
-    bool success = 1;
-}
-
-message MedicalInput {
-    string name = 1;
-    string value = 2;
-}
-
-message MedicalResponse {
-    string id = 1;
-    string name = 2;
-    string value = 3;
-}
-
-message ListMedicalResponse{
-    repeated MedicalResponse medicals = 1;
-}
-
-message FindMedialsRequest{
-    string id = 1;
-}
-
 
 message Register {
-    string type = 1;
+    required string type = 1;
     repeated Member members = 2;
-    Sponsor sponsor = 3;
+    required Sponsor sponsor = 3;
 }
 
+message RegisterSuccessResponse { required bool success = 1;}
+
 message Member {
-    string firstname = 1;
-    string lastname = 2;
-    string dob = 3;
-    string gender = 4;
-    string contact = 5;
-    string email = 6;
-    string relationship = 7;
-    string residentialAddress = 8;
-    Benefit benefit = 9;
-    MedicalHistory medicalHistory = 10;
+   optional string id = 1;
+   required string firstname = 2;
+   required string lastname = 3;
+   required string dob = 4;
+   required string gender = 5;
+   required string contact = 6;
+   required string email = 7;
+   required string relationship = 8;
+   required string residentialAddress = 9;
+   required Benefit benefit = 10;
+   required MedicalHistory medicalHistory = 11;
 }
 
 message Sponsor {
-    string name = 1;
-    string relationship = 2;
-    string contact = 3;
-    string email = 4;
-    string password = 5;
-    string residentialAddress = 6;
-    string postalAddress = 7;
-}
-
-message Medical {
-    string id = 1;
-    string name = 2;
-    double value = 3;
-}
-
-message MedicalHistory {
-    repeated Medical medicals = 1;
+   optional string id = 1;
+   required string name = 2;
+   required string relationship = 3;
+   required string contact = 4;
+   required string email = 5;
+   required string password = 6;
+   required string residentialAddress = 7;
+   required string postalAddress = 8;
 }
 
 message Benefit {
-    string benefitId = 1;
-    string title = 2;
+   required string benefitId = 1;
+   optional string title = 2;
 }
 
-message CreateRegisterRequest {
-  Register register = 1;
-}
+message MedicalHistory { repeated Medical medicals = 1;}
+
+message ListRegistersRequest {}
+
+message ListRegistersResponse {  repeated Register registers = 1;}
+
+message GetRegisterRequest { required string id = 1;}
+
+message CreateRegisterRequest { required Register register = 1;}
+
+message UpdateRegisterRequest { required Register register = 1;}
+
+message DeleteRegisterRequest { required string id = 1;}
+
+//endregion
 
 
-message RegisterResponse {
-    string activiationLink = 1;
+//region MEDICAL
+
+service MedicalService {
+  rpc ListMedicals(ListMedicalsRequest) returns (ListMedicalsResponse);
+
+  rpc GetMedical(GetMedicalRequest) returns (Medical);
+
+  rpc CreateMedical(CreateMedicalRequest) returns (MedicalSuccessResponse);
+
+  rpc UpdateMedical(UpdateMedicalRequest) returns (MedicalSuccessResponse);
+
+  rpc DeleteMedical(DeleteMedicalRequest) returns (MedicalSuccessResponse);
 }
+
+message Medical {
+    optional string id = 1;
+    required string name = 2;
+    required double value = 3;
+}
+
+message MedicalSuccessResponse { required bool success = 1;}
+
+message ListMedicalsRequest {}
+
+message ListMedicalsResponse { repeated Medical medicals = 1;}
+
+message GetMedicalRequest { required string id = 1;}
+
+message CreateMedicalRequest {repeated Medical medicals = 1;}
+
+message UpdateMedicalRequest { required Medical medical = 1;}
+
+message DeleteMedicalRequest { required string id = 1;}
+
+//endregion

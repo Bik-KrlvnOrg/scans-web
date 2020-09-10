@@ -1,13 +1,13 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { GetMedicalsQuery } from "../impl/get-medicals.query";
 import { Logger } from "@nestjs/common";
-import { MedicalRepository } from "../../repository/medical.repository";
 import { InjectRepository } from "@nestjs/typeorm";
 import { RpcException } from "@nestjs/microservices";
-import { ListMedicalsResponse } from "src/_proto/register";
+import { Medical } from "src/_proto/register";
+import { GetMedicalQuery } from "../impl";
+import { MedicalRepository } from "src/medical/repository/medical.repository";
 
-@QueryHandler(GetMedicalsQuery)
-export class GetMedicalsHandler implements IQueryHandler<GetMedicalsQuery>{
+@QueryHandler(GetMedicalQuery)
+export class GetMedicalHandler implements IQueryHandler<GetMedicalQuery>{
     logger = new Logger(this.constructor.name)
 
     constructor(
@@ -15,15 +15,16 @@ export class GetMedicalsHandler implements IQueryHandler<GetMedicalsQuery>{
         private readonly medicalRepository: MedicalRepository,
     ) { }
 
-    async execute(query: GetMedicalsQuery): Promise<ListMedicalsResponse> {
+    async execute(query: GetMedicalQuery): Promise<Medical> {
         try {
             this.logger.log(`async ${this.constructor.name}...`, query.constructor.name)
             const { request } = query
-            const medicals = await this.medicalRepository.find({ order: { name: 'ASC' } })
-            return { medicals }
+            const medical = await this.medicalRepository.findOne({ where: { id: request } })
+            return medical
         } catch (err) {
             this.logger.log(err)
             throw new RpcException({ message: err.message, code: 500 })
         }
     }
+
 }

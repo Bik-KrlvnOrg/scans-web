@@ -1,17 +1,17 @@
 import { Field, ObjectType, ID } from "@nestjs/graphql";
-import {  MedicalSuccessResponse } from "src/_proto/register";
+import { MedicalSuccessResponse, Medical } from "src/_proto/register";
 
 
 @ObjectType('medical')
-export class MedicalResponseType {
-    @Field(type => ID)
+export class MedicalType implements Medical {
+    @Field(type => ID, { nullable: true })
     id: string
 
     @Field()
     name: string;
 
     @Field()
-    value: string
+    value: number
 }
 
 @ObjectType()

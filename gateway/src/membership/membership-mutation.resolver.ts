@@ -18,6 +18,7 @@ export class MembershipMutationResolver implements OnModuleInit {
     @Mutation(returns => RegisterResponseType)
     async createMembership(@Args('input') register: CreateRegisterInput) {
         const result = await this.registerRpc.createRegister(register).toPromise()
+        console.log('rs',result)
         return result
     }
 }

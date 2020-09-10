@@ -7,7 +7,7 @@ import { CreateRegisterRequest } from 'src/_proto/register';
 export class MembershipController {
     constructor(private readonly membershipService: MembershipService) { }
 
-    @GrpcMethod('RegisterService', 'createRegister')
+    @GrpcMethod('RegisterService', 'CreateRegister')
     async registerPolicy(req: CreateRegisterRequest) {
         return this.membershipService.createMembership(req)
     }

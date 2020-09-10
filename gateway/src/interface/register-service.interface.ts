@@ -1,6 +1,5 @@
-import { Observable } from "rxjs";
-import { CreateRegisterRequest, RegisterResponse } from "src/_proto/register";
+import { RegisterServiceClient, MedicalServiceClient } from "src/_proto/register";
 
-export interface IRegisterRpcService{
-    createRegister(req:CreateRegisterRequest):Observable<RegisterResponse>
-}
+export interface IRegisterRpcService extends RegisterServiceClient<any> { }
+
+export interface IMedicalRpcService extends MedicalServiceClient<any> { }
