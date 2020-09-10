@@ -1,0 +1,114 @@
+version: "3"
+
+services:
+  gateway:
+    container_name: scans-gateway
+    build:
+      context: "./gateway"
+    image: "scans-gateway:latest"
+    networks:
+      - gateway
+    ports:
+      - 4000:4000
+    depends_on:
+      - register-svc
+      - benefit-svc
+    environment:
+      NODE_ENV: "development"
+      GRAPHQL_PORT: 4000
+      REGISTER_SVC_URL: "register-svc:5051"
+      REGISTER_SVC_PACKAGE: "io.scans.srv.register"
+      BENEFIT_SVC_URL: "benefit-svc:5061"
+      BENEFIT_PROTO_PACKAGE: "io.scans.srv.benefit"
+    volumes:
+      - ./gateway_data/graphql:/usr/src/gateway/dist/graphql
+
+  register-svc:
+    container_name: scans-register-svc
+    build:
+      context: "./microservice/register-svc"
+    image: "scans-register-svc:latest"
+    networks:
+      - gateway
+      - register-svc
+    expose:
+      - "5051"
+    depends_on:
+      - register-db
+    restart: always
+    environment:
+      REGISTER_SVC_URL: "0.0.0.0:5051"
+      REGISTER_PROTO_PACKAGE: "io.scans.srv.register"
+      DATABASE_HOST: register-db
+      DATABASE_DB: register-svc
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_PORT: 5432
+      DATABASE_SYNC: "true"
+      DATABASE_LOG: "false"
+      DATABASE_DROP_SCHEMA: "false"
+
+  register-db:
+    container_name: "register-svc-db"
+    image: postgres:9.6
+    networks:
+      - register-svc
+    expose:
+      - "5432"
+    restart: "on-failure"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "register-svc"
+    volumes:
+      - ./register_data/postgres:/var/lib/postgresql/data
+
+  benefit-svc:
+    container_name: scans-benefit-svc
+    build:
+      context: "./microservice/benefit-svc"
+    image: "scans-benefit-svc:latest"
+    networks:
+      - gateway
+      - benefit-svc
+    expose:
+      - "5061"
+    depends_on:
+      - benefit-db
+    restart: "on-failure"
+    environment:
+      BENEFIT_SVC_URL: "0.0.0.0:5061"
+      BENEFIT_PROTO_PACKAGE: "io.scans.srv.benefit"
+      DATABASE_HOST: benefit-db
+      DATABASE_DB: benefit-svc
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_PORT: 5432
+      DATABASE_SYNC: "true"
+      DATABASE_LOG: "false"
+      DATABASE_DROP_SCHEMA: "false"
+
+  benefit-db:
+    container_name: "benefit-svc-db"
+    image: postgres:9.6
+    networks:
+      - benefit-svc
+    expose:
+      - "5432"
+    restart: "on-failure"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "benefit-svc"
+    volumes:
+      - ./benefit_data/postgres:/var/lib/postgresql/data
+
+volumes:
+  register_data:
+  benefit_data:
+  gateway_data:
+
+networks:
+  register-svc:
+  benefit-svc:
+  gateway:

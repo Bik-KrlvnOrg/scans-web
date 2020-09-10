@@ -1,0 +1,19 @@
+{
+  "name": "scans",
+  "description": "GRAPHQL API with GRPC backend microservice. Built using Nestjs Framework",
+  "version": "1.0.0",
+  "main": "main.js",
+  "author": "Kelvin Birikorang",
+  "license": "MIT",
+  "scripts": {
+    "build":"./scripts/build.sh",
+    "install": "./scripts/install.sh",
+    "docker:build":"docker-compose build",
+    "docker:start":"yarn docker:build && docker-compose up -d",
+    "docker:stop":"docker-compose down",
+    "start": "yarn docker:start",
+    "stop": "yarn docker:stop",
+    "start:dev":"yarn install && yarn build"
+    
+  }
+}
