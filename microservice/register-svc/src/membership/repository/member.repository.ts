@@ -4,8 +4,8 @@ import { Member } from "src/_proto/register";
 
 @EntityRepository(MemberEntity)
 export class MemberRepository extends Repository<MemberEntity>{
-    async createMember(data: Member): Promise<MemberEntity> {
-        const entity = this.create(data);
-        return await this.save(entity)
+    async createMember(data: Member[]): Promise<MemberEntity[]> {
+        const entities = this.create(data);
+        return await this.save(entities)
     }
 }

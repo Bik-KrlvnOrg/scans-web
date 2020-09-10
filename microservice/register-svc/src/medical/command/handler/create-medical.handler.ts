@@ -21,12 +21,12 @@ export class CreateMedicalHandler implements ICommandHandler<CreateMedicalComman
         try {
             this.logger.log(`async ${this.constructor.name}...`, command.constructor.name);
             const { cmd } = command;
-            const result = await this.medicalRepository.createMedicals(cmd.medicals)
+            const result = await this.medicalRepository.createMedicals(cmd)
             this.event$.publish(new MedicalCreatedEvent(result.raw))
             return { success: true }
         } catch (err) {
             this.logger.log(err)
-            throw new RpcException({ message: err.message })
+            throw new RpcException({ code:500,message: err.message })
         }
     }
 }

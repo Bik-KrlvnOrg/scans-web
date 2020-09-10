@@ -8,6 +8,6 @@ export class MedicalEntity extends AbstractEntity {
     @Column({ unique: true })
     name: string;
 
-    @Column()
-    value: string;
+    @Column({type:'real'})
+    value: number;
 }

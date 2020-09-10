@@ -1,16 +1,21 @@
 import { Field, InputType } from '@nestjs/graphql'
 import { ValidateNested } from 'class-validator'
-import { MedicalInputDto, UpdateMedicalInputDto } from 'src/dto/medical.dto'
-import { CreateMedicalRequest } from 'src/_proto/register'
+import { CreateMedicalRequest, UpdateMedicalRequest, Medical } from 'src/_proto/register'
 import { Type } from 'class-transformer'
+import { MedicalDto } from 'src/dto/register.dto'
 
 @InputType()
-export class CreateMedicalInput implements CreateMedicalRequest {
-    @Field(type => [MedicalInputDto])
+export class MedicalInput implements CreateMedicalRequest {
+    @Field(type => [MedicalDto])
     @ValidateNested({ each: true })
-    @Type(() => MedicalInputDto)
-    medicals: MedicalInputDto[]
+    @Type(() => MedicalDto)
+    medicals: MedicalDto[]
 }
 
 @InputType()
-export class UpdateMedicalInput extends UpdateMedicalInputDto { }
+export class UpdateMedicalInput implements UpdateMedicalRequest {
+    @Field(type => MedicalDto)
+    @ValidateNested({ each: true })
+    @Type(() => MedicalDto)
+    medical: MedicalDto
+}

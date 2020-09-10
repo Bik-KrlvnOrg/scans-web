@@ -1,16 +1,47 @@
-import { IsNotEmpty, IsPhoneNumber, IsEmail, IsString, MinLength, ValidateNested } from "class-validator";
-import { Field, InputType } from "@nestjs/graphql";
+import { IsNotEmpty, IsPhoneNumber, IsEmail, IsString, MinLength, ValidateNested, IsOptional, IsUUID, IsNumber } from "class-validator";
+import { Field, InputType, ID } from "@nestjs/graphql";
 import { Benefit, Medical, MedicalHistory, Member, Sponsor, Register } from '../_proto/register'
 import { Type } from "class-transformer";
+
+
+@InputType()
+export class MedicalInputDto implements Medical {
+    @Field(type => ID, { nullable: true })
+    @IsOptional()
+    @IsUUID()
+    id: string;
+
+    @Field()
+    @IsNotEmpty()
+    name: string;
+
+    @Field()
+    @IsNumber()
+    value: number;
+}
+
+@InputType()
+export class FindMedicalInputDto {
+    @Field(type => ID)
+    @IsUUID()
+    id: string
+}
+
+@InputType()
+export class RemoveMedicalInputDto {
+    @Field(type => ID)
+    @IsUUID()
+    id: string
+}
 
 @InputType()
 export class BenefitDto implements Benefit {
     @Field()
-    @IsNotEmpty()
+    @IsUUID()
     benefitId: string;
 
-    @Field()
-    @IsNotEmpty()
+    @Field({ nullable: true })
+    @IsOptional()
     title: string;
 }
 
@@ -24,6 +55,7 @@ export class MedicalHistoryDto implements MedicalHistory {
 
 @InputType()
 export class MemberDto implements Member {
+    id: string;
     @Field()
     @MinLength(2)
     firstname: string;
@@ -70,6 +102,11 @@ export class MemberDto implements Member {
 
 @InputType()
 export class SponsorDto implements Sponsor {
+    @Field(type => ID, { nullable: true })
+    @IsOptional()
+    @IsUUID()
+    id: string;
+
     @Field()
     @MinLength(2)
     name: string;
@@ -103,16 +140,17 @@ export class SponsorDto implements Sponsor {
 
 @InputType()
 export class MedicalDto implements Medical {
-    @Field()
-    @IsNotEmpty()
+    @Field(type => ID, { nullable: true })
+    @IsOptional()
+    @IsUUID()
     id: string;
 
     @Field()
-    @IsNotEmpty()
+    @MinLength(2)
     name: string;
 
     @Field()
-    @IsNotEmpty()
+    @IsNumber()
     value: number;
 }
 
@@ -121,7 +159,7 @@ export class RegisterDto implements Register {
     @Field()
     @IsNotEmpty()
     type: string;
-   
+
     @Field(type => [MemberDto])
     @ValidateNested({ each: true })
     @Type(() => MemberDto)

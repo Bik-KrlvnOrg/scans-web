@@ -22,10 +22,8 @@ export class UpdateMedicalHandler implements ICommandHandler<UpdateMedicalComman
 
             const medical = await this.medicalRepository.findOne({ where: { id: cmd.id } })
             if (!medical) throw new RpcException({ message: 'medical not found', code: 404 })
-
-            medical.name = cmd.name
-            medical.value = cmd.value
-            const result = await this.medicalRepository.save(medical)
+            const entity = this.medicalRepository.create(cmd)
+            const result = await this.medicalRepository.save(entity)
             this.event$.publish(new MedicalUpdatedEvent(result))
             return { success: true }
         } catch (err) {

@@ -1,6 +1,6 @@
 #! /usr/bin/sh
 
-SRC_DIR="./src/_proto/*.proto"
+SRC_DIR="./src/_proto/register.proto"
 DEST_DIR="./src/_proto"
 
 protoc --plugin=node_modules/ts-proto/protoc-gen-ts_proto \

@@ -4,6 +4,7 @@ import { Logger } from "@nestjs/common";
 import { SponsorRepository } from "../../repository/sponsor.repository";
 import { InjectRepository } from "@nestjs/typeorm";
 import { SponsorCreatedEvent } from "../../event";
+import { RegisterSuccessResponse } from "src/_proto/register";
 
 @CommandHandler(CreateSponsorCommand)
 export class CreateSponsorHandler implements ICommandHandler<CreateSponsorCommand>{
@@ -14,7 +15,7 @@ export class CreateSponsorHandler implements ICommandHandler<CreateSponsorComman
         private readonly sponsorRepository: SponsorRepository,
         private readonly event$: EventBus) { }
 
-    async execute(command: CreateSponsorCommand): Promise<any> {
+    async execute(command: CreateSponsorCommand): Promise<RegisterSuccessResponse> {
         this.logger.log(`async ${this.constructor.name}...`, command.constructor.name)
         const { req, members } = command
 

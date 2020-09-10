@@ -1,6 +1,6 @@
 import { IQuery } from "@nestjs/cqrs";
-import { FindMedialsRequest } from "src/_proto/register";
+import { GetMedicalRequest, ListMedicalsRequest } from "src/_proto/register";
 
 export class GetMedicalsQuery implements IQuery { 
-    constructor(public readonly request:FindMedialsRequest){}
+    constructor(public readonly request:ListMedicalsRequest){}
 }

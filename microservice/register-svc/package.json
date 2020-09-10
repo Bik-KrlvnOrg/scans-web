@@ -14,7 +14,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "gen:proto": "./gen-proto.sh",
-    "copy:protos": "cp -r ../../_proto ./src",
+    "copy:protos": "mkdir -p src/_proto && cp -r ../../_proto/register.proto ./src/_proto",
     "copy:proto-dist": "cp -r src/_proto/*.proto dist/libs",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",

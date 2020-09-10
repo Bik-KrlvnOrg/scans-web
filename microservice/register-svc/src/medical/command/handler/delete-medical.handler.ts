@@ -20,8 +20,8 @@ export class DeleteMedicalHandler implements ICommandHandler<DeleteMedicalComman
         try {
             this.logger.log(`async ${this.constructor.name}...`, command.constructor.name)
             const { cmd } = command
-            const medical = await this.medicalRepository.findOne({ where: { id: cmd.id } })
-            if (!medical) throw new RpcException({ message: "Medical not found", code: 404 })
+            const medical = await this.medicalRepository.findOne({ where: { id: cmd } })
+            if (!medical) throw new RpcException({ message: "medical not found", code: 404 })
 
             const result = await this.medicalRepository.remove(medical)
             this.event$.publish(new MedicalDeletedEvent(result))

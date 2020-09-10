@@ -1,6 +1,6 @@
 import { ICommand } from '@nestjs/cqrs'
-import { CreateMedicalRequest } from 'src/_proto/register';
+import {  Medical } from 'src/_proto/register';
 
 export class CreateMedicalCommand implements ICommand {
-    constructor(public readonly cmd: CreateMedicalRequest) { }
+    constructor(public readonly cmd: Medical[]) { }
 }
