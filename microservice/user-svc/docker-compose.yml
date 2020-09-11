@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  user-svc:
+    container_name: scans-user-svc
+    build:
+      context: "."
+    networks:
+      - user-svc
+    expose:
+      - "5071"
+    depends_on:
+      - user-es
+    restart: "on-failure"
+    environment:
+      ES_HOST: user-es
+      ES_USER: ${ES_USER}
+      ES_PASSWORD: ${ES_PASSWORD}
+      ES_PORT: ${ES_PORT}
+
+  user-es:
+    container_name: user-event-store
+    image: eventstore/eventstore:release-5.0.8
+    ports:
+      - "2113:2113"
+      - "1113:1113"
+    networks:
+      - user-svc
+    environment:
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+
+networks:
+  user-svc:

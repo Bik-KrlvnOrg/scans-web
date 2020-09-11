@@ -13,6 +13,7 @@ services:
     depends_on:
       - register-svc
       - benefit-svc
+      - user-svc
     environment:
       NODE_ENV: "development"
       GRAPHQL_PORT: 4000
@@ -20,6 +21,8 @@ services:
       REGISTER_SVC_PACKAGE: "io.scans.srv.register"
       BENEFIT_SVC_URL: "benefit-svc:5061"
       BENEFIT_PROTO_PACKAGE: "io.scans.srv.benefit"
+      USER_SVC_URL: "user-svc:5071"
+      USER_PROTO_PACKAGE: "io.scans.srv.user"
     volumes:
       - ./gateway_data/graphql:/usr/src/gateway/dist/graphql
 
@@ -103,6 +106,39 @@ services:
     volumes:
       - ./benefit_data/postgres:/var/lib/postgresql/data
 
+  user-svc:
+    container_name: scans-user-svc
+    build:
+      context: "./microservice/user-svc"
+    image: "scans-user-svc:latest"
+    networks:
+      - gateway
+      - user-svc
+    expose:
+      - "5071"
+    depends_on:
+      - user-es
+    restart: "on-failure"
+    environment:
+      ES_HOST: user-es
+      ES_USER: admin
+      ES_PASSWORD: changeit
+      ES_PORT: 1113
+      USER_SVC_URL: "0.0.0.0:5071"
+      USER_PROTO_PACKAGE: "io.scans.srv.user"
+
+  user-es:
+    container_name: "user-svc-eventstore"
+    image: eventstore/eventstore:release-5.0.8
+    ports:
+      - "2113:2113"
+      - "1113:1113"
+    networks:
+      - user-svc
+    environment:
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+
 volumes:
   register_data:
   benefit_data:
@@ -111,4 +147,5 @@ volumes:
 networks:
   register-svc:
   benefit-svc:
+  user-svc:
   gateway:

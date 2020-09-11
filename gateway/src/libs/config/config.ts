@@ -17,6 +17,14 @@ export const config = () => ({
             package: `${process.env.BENEFIT_SVC_PACKAGE}`,
             protoPath: join(__dirname, '../benefit.proto')
         }
+    },
+    userRpc: {
+        transport: Transport.GRPC,
+        options: {
+            url: `${process.env.USER_SVC_URL}`,
+            package: `${process.env.USER_PROTO_PACKAGE}`,
+            protoPath: join(__dirname, '../user.proto')
+        }
     }
 
 })

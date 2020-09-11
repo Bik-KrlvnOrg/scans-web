@@ -1,0 +1,37 @@
+syntax = "proto2";
+package io.scans.srv.user;
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service UserService {
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+
+  rpc GetUser(GetUserRequest) returns (User);
+
+  rpc CreateUser(CreateUserRequest) returns (UserSuccessResponse);
+
+  rpc UpdateUser(UpdateUserRequest) returns (UserSuccessResponse);
+
+  rpc DeleteUser(DeleteUserRequest) returns (UserSuccessResponse);
+}
+
+message User {
+    optional string id = 1;
+    required string name = 2;
+    required string username = 3;
+    required string email = 4;
+    required string password = 5;
+}
+
+message UserSuccessResponse { required bool success = 1;}
+
+message ListUsersRequest { }
+
+message ListUsersResponse {repeated User users = 1;}
+
+message GetUserRequest { required string id = 1;}
+
+message CreateUserRequest {required User user = 3;}
+
+message UpdateUserRequest {required  User user = 1;}
+
+message DeleteUserRequest { required string id = 1;}

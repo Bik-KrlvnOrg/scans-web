@@ -1,0 +1,7 @@
+dist
+node_modules
+test
+*_data
+Dockerfile
+yarn-error.log
+.env.example
