@@ -5,7 +5,7 @@ import { Writer, Reader } from 'protobufjs/minimal';
 
 export interface Register {
   type: string;
-  members: Member[];
+  group: Group | undefined;
   sponsor: Sponsor | undefined;
 }
 
@@ -23,8 +23,17 @@ export interface Member {
   email: string;
   relationship: string;
   residentialAddress: string;
-  benefit: Benefit | undefined;
-  medicalHistory: MedicalHistory | undefined;
+  rateId: string;
+  premiumId: string;
+  medicals: Medical[];
+}
+
+export interface MemberGroup {
+  id: string;
+  principalId: string;
+  premiumId: string;
+  group: Group | undefined;
+  members: Member[];
 }
 
 export interface Sponsor {
@@ -36,6 +45,7 @@ export interface Sponsor {
   password: string;
   residentialAddress: string;
   postalAddress: string;
+  members: Member[];
 }
 
 export interface Benefit {
@@ -103,9 +113,42 @@ export interface DeleteMedicalRequest {
   id: string;
 }
 
+export interface Group {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface GroupSuccessResponse {
+  success: boolean;
+}
+
+export interface ListGroupsRequest {
+}
+
+export interface ListGroupsResponse {
+  groups: Group[];
+}
+
+export interface GetGroupRequest {
+  id: string;
+}
+
+export interface CreateGroupRequest {
+  group: Group | undefined;
+}
+
+export interface UpdateGroupRequest {
+  group: Group | undefined;
+}
+
+export interface DeleteGroupRequest {
+  id: string;
+}
+
 const baseRegister: object = {
   type: '',
-  members: undefined,
+  group: undefined,
   sponsor: undefined,
 };
 
@@ -123,8 +166,17 @@ const baseMember: object = {
   email: '',
   relationship: '',
   residentialAddress: '',
-  benefit: undefined,
-  medicalHistory: undefined,
+  rateId: '',
+  premiumId: '',
+  medicals: undefined,
+};
+
+const baseMemberGroup: object = {
+  id: '',
+  principalId: '',
+  premiumId: '',
+  group: undefined,
+  members: undefined,
 };
 
 const baseSponsor: object = {
@@ -136,6 +188,7 @@ const baseSponsor: object = {
   password: '',
   residentialAddress: '',
   postalAddress: '',
+  members: undefined,
 };
 
 const baseBenefit: object = {
@@ -203,6 +256,39 @@ const baseDeleteMedicalRequest: object = {
   id: '',
 };
 
+const baseGroup: object = {
+  id: '',
+  name: '',
+  description: '',
+};
+
+const baseGroupSuccessResponse: object = {
+  success: false,
+};
+
+const baseListGroupsRequest: object = {
+};
+
+const baseListGroupsResponse: object = {
+  groups: undefined,
+};
+
+const baseGetGroupRequest: object = {
+  id: '',
+};
+
+const baseCreateGroupRequest: object = {
+  group: undefined,
+};
+
+const baseUpdateGroupRequest: object = {
+  group: undefined,
+};
+
+const baseDeleteGroupRequest: object = {
+  id: '',
+};
+
 /**
  *  Generated according to https://cloud.google.com/apis/design/standard_methods
  */
@@ -265,6 +351,40 @@ export interface MedicalServiceClient<Context extends DataLoaders> {
 
 }
 
+/**
+ *  region GROUP
+ */
+export interface GroupService<Context extends DataLoaders> {
+
+  listGroups(request: ListGroupsRequest, ctx: Context): Promise<ListGroupsResponse>;
+
+  getGroup(request: GetGroupRequest, ctx: Context): Promise<Group>;
+
+  createGroup(request: CreateGroupRequest, ctx: Context): Promise<GroupSuccessResponse>;
+
+  updateGroup(request: UpdateGroupRequest, ctx: Context): Promise<GroupSuccessResponse>;
+
+  deleteGroup(request: DeleteGroupRequest, ctx: Context): Promise<GroupSuccessResponse>;
+
+}
+
+/**
+ *  region GROUP
+ */
+export interface GroupServiceClient<Context extends DataLoaders> {
+
+  listGroups(request: ListGroupsRequest, ctx?: Context): Observable<ListGroupsResponse>;
+
+  getGroup(request: GetGroupRequest, ctx?: Context): Observable<Group>;
+
+  createGroup(request: CreateGroupRequest, ctx?: Context): Observable<GroupSuccessResponse>;
+
+  updateGroup(request: UpdateGroupRequest, ctx?: Context): Observable<GroupSuccessResponse>;
+
+  deleteGroup(request: DeleteGroupRequest, ctx?: Context): Observable<GroupSuccessResponse>;
+
+}
+
 interface DataLoaders {
 
   getDataLoader<T>(identifier: string, constructorFn: () => T): T;
@@ -274,8 +394,8 @@ interface DataLoaders {
 export const Register = {
   encode(message: Register, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.type);
-    for (const v of message.members) {
-      Member.encode(v!, writer.uint32(18).fork()).ldelim();
+    if (message.group !== undefined && message.group !== undefined) {
+      Group.encode(message.group, writer.uint32(18).fork()).ldelim();
     }
     if (message.sponsor !== undefined && message.sponsor !== undefined) {
       Sponsor.encode(message.sponsor, writer.uint32(26).fork()).ldelim();
@@ -285,7 +405,6 @@ export const Register = {
   decode(reader: Reader, length?: number): Register {
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = Object.create(baseRegister) as Register;
-    message.members = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -293,7 +412,7 @@ export const Register = {
           message.type = reader.string();
           break;
         case 2:
-          message.members.push(Member.decode(reader, reader.uint32()));
+          message.group = Group.decode(reader, reader.uint32());
           break;
         case 3:
           message.sponsor = Sponsor.decode(reader, reader.uint32());
@@ -307,16 +426,15 @@ export const Register = {
   },
   fromJSON(object: any): Register {
     const message = Object.create(baseRegister) as Register;
-    message.members = [];
     if (object.type !== undefined && object.type !== null) {
       message.type = String(object.type);
     } else {
       message.type = '';
     }
-    if (object.members !== undefined && object.members !== null) {
-      for (const e of object.members) {
-        message.members.push(Member.fromJSON(e));
-      }
+    if (object.group !== undefined && object.group !== null) {
+      message.group = Group.fromJSON(object.group);
+    } else {
+      message.group = undefined;
     }
     if (object.sponsor !== undefined && object.sponsor !== null) {
       message.sponsor = Sponsor.fromJSON(object.sponsor);
@@ -327,16 +445,15 @@ export const Register = {
   },
   fromPartial(object: DeepPartial<Register>): Register {
     const message = Object.create(baseRegister) as Register;
-    message.members = [];
     if (object.type !== undefined && object.type !== null) {
       message.type = object.type;
     } else {
       message.type = '';
     }
-    if (object.members !== undefined && object.members !== null) {
-      for (const e of object.members) {
-        message.members.push(Member.fromPartial(e));
-      }
+    if (object.group !== undefined && object.group !== null) {
+      message.group = Group.fromPartial(object.group);
+    } else {
+      message.group = undefined;
     }
     if (object.sponsor !== undefined && object.sponsor !== null) {
       message.sponsor = Sponsor.fromPartial(object.sponsor);
@@ -348,11 +465,7 @@ export const Register = {
   toJSON(message: Register): unknown {
     const obj: any = {};
     obj.type = message.type || '';
-    if (message.members) {
-      obj.members = message.members.map(e => e ? Member.toJSON(e) : undefined);
-    } else {
-      obj.members = [];
-    }
+    obj.group = message.group ? Group.toJSON(message.group) : undefined;
     obj.sponsor = message.sponsor ? Sponsor.toJSON(message.sponsor) : undefined;
     return obj;
   },
@@ -415,17 +528,17 @@ export const Member = {
     writer.uint32(58).string(message.email);
     writer.uint32(66).string(message.relationship);
     writer.uint32(74).string(message.residentialAddress);
-    if (message.benefit !== undefined && message.benefit !== undefined) {
-      Benefit.encode(message.benefit, writer.uint32(82).fork()).ldelim();
-    }
-    if (message.medicalHistory !== undefined && message.medicalHistory !== undefined) {
-      MedicalHistory.encode(message.medicalHistory, writer.uint32(90).fork()).ldelim();
+    writer.uint32(82).string(message.rateId);
+    writer.uint32(90).string(message.premiumId);
+    for (const v of message.medicals) {
+      Medical.encode(v!, writer.uint32(98).fork()).ldelim();
     }
     return writer;
   },
   decode(reader: Reader, length?: number): Member {
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = Object.create(baseMember) as Member;
+    message.medicals = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -457,10 +570,13 @@ export const Member = {
           message.residentialAddress = reader.string();
           break;
         case 10:
-          message.benefit = Benefit.decode(reader, reader.uint32());
+          message.rateId = reader.string();
           break;
         case 11:
-          message.medicalHistory = MedicalHistory.decode(reader, reader.uint32());
+          message.premiumId = reader.string();
+          break;
+        case 12:
+          message.medicals.push(Medical.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -471,6 +587,7 @@ export const Member = {
   },
   fromJSON(object: any): Member {
     const message = Object.create(baseMember) as Member;
+    message.medicals = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = String(object.id);
     } else {
@@ -516,20 +633,26 @@ export const Member = {
     } else {
       message.residentialAddress = '';
     }
-    if (object.benefit !== undefined && object.benefit !== null) {
-      message.benefit = Benefit.fromJSON(object.benefit);
+    if (object.rateId !== undefined && object.rateId !== null) {
+      message.rateId = String(object.rateId);
     } else {
-      message.benefit = undefined;
+      message.rateId = '';
     }
-    if (object.medicalHistory !== undefined && object.medicalHistory !== null) {
-      message.medicalHistory = MedicalHistory.fromJSON(object.medicalHistory);
+    if (object.premiumId !== undefined && object.premiumId !== null) {
+      message.premiumId = String(object.premiumId);
     } else {
-      message.medicalHistory = undefined;
+      message.premiumId = '';
+    }
+    if (object.medicals !== undefined && object.medicals !== null) {
+      for (const e of object.medicals) {
+        message.medicals.push(Medical.fromJSON(e));
+      }
     }
     return message;
   },
   fromPartial(object: DeepPartial<Member>): Member {
     const message = Object.create(baseMember) as Member;
+    message.medicals = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
@@ -575,15 +698,20 @@ export const Member = {
     } else {
       message.residentialAddress = '';
     }
-    if (object.benefit !== undefined && object.benefit !== null) {
-      message.benefit = Benefit.fromPartial(object.benefit);
+    if (object.rateId !== undefined && object.rateId !== null) {
+      message.rateId = object.rateId;
     } else {
-      message.benefit = undefined;
+      message.rateId = '';
     }
-    if (object.medicalHistory !== undefined && object.medicalHistory !== null) {
-      message.medicalHistory = MedicalHistory.fromPartial(object.medicalHistory);
+    if (object.premiumId !== undefined && object.premiumId !== null) {
+      message.premiumId = object.premiumId;
     } else {
-      message.medicalHistory = undefined;
+      message.premiumId = '';
+    }
+    if (object.medicals !== undefined && object.medicals !== null) {
+      for (const e of object.medicals) {
+        message.medicals.push(Medical.fromPartial(e));
+      }
     }
     return message;
   },
@@ -598,8 +726,130 @@ export const Member = {
     obj.email = message.email || '';
     obj.relationship = message.relationship || '';
     obj.residentialAddress = message.residentialAddress || '';
-    obj.benefit = message.benefit ? Benefit.toJSON(message.benefit) : undefined;
-    obj.medicalHistory = message.medicalHistory ? MedicalHistory.toJSON(message.medicalHistory) : undefined;
+    obj.rateId = message.rateId || '';
+    obj.premiumId = message.premiumId || '';
+    if (message.medicals) {
+      obj.medicals = message.medicals.map(e => e ? Medical.toJSON(e) : undefined);
+    } else {
+      obj.medicals = [];
+    }
+    return obj;
+  },
+};
+
+export const MemberGroup = {
+  encode(message: MemberGroup, writer: Writer = Writer.create()): Writer {
+    writer.uint32(10).string(message.id);
+    writer.uint32(18).string(message.principalId);
+    writer.uint32(26).string(message.premiumId);
+    if (message.group !== undefined && message.group !== undefined) {
+      Group.encode(message.group, writer.uint32(34).fork()).ldelim();
+    }
+    for (const v of message.members) {
+      Member.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(reader: Reader, length?: number): MemberGroup {
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = Object.create(baseMemberGroup) as MemberGroup;
+    message.members = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.string();
+          break;
+        case 2:
+          message.principalId = reader.string();
+          break;
+        case 3:
+          message.premiumId = reader.string();
+          break;
+        case 4:
+          message.group = Group.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.members.push(Member.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): MemberGroup {
+    const message = Object.create(baseMemberGroup) as MemberGroup;
+    message.members = [];
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id);
+    } else {
+      message.id = '';
+    }
+    if (object.principalId !== undefined && object.principalId !== null) {
+      message.principalId = String(object.principalId);
+    } else {
+      message.principalId = '';
+    }
+    if (object.premiumId !== undefined && object.premiumId !== null) {
+      message.premiumId = String(object.premiumId);
+    } else {
+      message.premiumId = '';
+    }
+    if (object.group !== undefined && object.group !== null) {
+      message.group = Group.fromJSON(object.group);
+    } else {
+      message.group = undefined;
+    }
+    if (object.members !== undefined && object.members !== null) {
+      for (const e of object.members) {
+        message.members.push(Member.fromJSON(e));
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MemberGroup>): MemberGroup {
+    const message = Object.create(baseMemberGroup) as MemberGroup;
+    message.members = [];
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = '';
+    }
+    if (object.principalId !== undefined && object.principalId !== null) {
+      message.principalId = object.principalId;
+    } else {
+      message.principalId = '';
+    }
+    if (object.premiumId !== undefined && object.premiumId !== null) {
+      message.premiumId = object.premiumId;
+    } else {
+      message.premiumId = '';
+    }
+    if (object.group !== undefined && object.group !== null) {
+      message.group = Group.fromPartial(object.group);
+    } else {
+      message.group = undefined;
+    }
+    if (object.members !== undefined && object.members !== null) {
+      for (const e of object.members) {
+        message.members.push(Member.fromPartial(e));
+      }
+    }
+    return message;
+  },
+  toJSON(message: MemberGroup): unknown {
+    const obj: any = {};
+    obj.id = message.id || '';
+    obj.principalId = message.principalId || '';
+    obj.premiumId = message.premiumId || '';
+    obj.group = message.group ? Group.toJSON(message.group) : undefined;
+    if (message.members) {
+      obj.members = message.members.map(e => e ? Member.toJSON(e) : undefined);
+    } else {
+      obj.members = [];
+    }
     return obj;
   },
 };
@@ -614,11 +864,15 @@ export const Sponsor = {
     writer.uint32(50).string(message.password);
     writer.uint32(58).string(message.residentialAddress);
     writer.uint32(66).string(message.postalAddress);
+    for (const v of message.members) {
+      Member.encode(v!, writer.uint32(74).fork()).ldelim();
+    }
     return writer;
   },
   decode(reader: Reader, length?: number): Sponsor {
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = Object.create(baseSponsor) as Sponsor;
+    message.members = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -646,6 +900,9 @@ export const Sponsor = {
         case 8:
           message.postalAddress = reader.string();
           break;
+        case 9:
+          message.members.push(Member.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -655,6 +912,7 @@ export const Sponsor = {
   },
   fromJSON(object: any): Sponsor {
     const message = Object.create(baseSponsor) as Sponsor;
+    message.members = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = String(object.id);
     } else {
@@ -695,10 +953,16 @@ export const Sponsor = {
     } else {
       message.postalAddress = '';
     }
+    if (object.members !== undefined && object.members !== null) {
+      for (const e of object.members) {
+        message.members.push(Member.fromJSON(e));
+      }
+    }
     return message;
   },
   fromPartial(object: DeepPartial<Sponsor>): Sponsor {
     const message = Object.create(baseSponsor) as Sponsor;
+    message.members = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
@@ -739,6 +1003,11 @@ export const Sponsor = {
     } else {
       message.postalAddress = '';
     }
+    if (object.members !== undefined && object.members !== null) {
+      for (const e of object.members) {
+        message.members.push(Member.fromPartial(e));
+      }
+    }
     return message;
   },
   toJSON(message: Sponsor): unknown {
@@ -751,6 +1020,11 @@ export const Sponsor = {
     obj.password = message.password || '';
     obj.residentialAddress = message.residentialAddress || '';
     obj.postalAddress = message.postalAddress || '';
+    if (message.members) {
+      obj.members = message.members.map(e => e ? Member.toJSON(e) : undefined);
+    } else {
+      obj.members = [];
+    }
     return obj;
   },
 };
@@ -1542,6 +1816,402 @@ export const DeleteMedicalRequest = {
     return message;
   },
   toJSON(message: DeleteMedicalRequest): unknown {
+    const obj: any = {};
+    obj.id = message.id || '';
+    return obj;
+  },
+};
+
+export const Group = {
+  encode(message: Group, writer: Writer = Writer.create()): Writer {
+    writer.uint32(10).string(message.id);
+    writer.uint32(18).string(message.name);
+    writer.uint32(26).string(message.description);
+    return writer;
+  },
+  decode(reader: Reader, length?: number): Group {
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = Object.create(baseGroup) as Group;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.string();
+          break;
+        case 2:
+          message.name = reader.string();
+          break;
+        case 3:
+          message.description = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): Group {
+    const message = Object.create(baseGroup) as Group;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id);
+    } else {
+      message.id = '';
+    }
+    if (object.name !== undefined && object.name !== null) {
+      message.name = String(object.name);
+    } else {
+      message.name = '';
+    }
+    if (object.description !== undefined && object.description !== null) {
+      message.description = String(object.description);
+    } else {
+      message.description = '';
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<Group>): Group {
+    const message = Object.create(baseGroup) as Group;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = '';
+    }
+    if (object.name !== undefined && object.name !== null) {
+      message.name = object.name;
+    } else {
+      message.name = '';
+    }
+    if (object.description !== undefined && object.description !== null) {
+      message.description = object.description;
+    } else {
+      message.description = '';
+    }
+    return message;
+  },
+  toJSON(message: Group): unknown {
+    const obj: any = {};
+    obj.id = message.id || '';
+    obj.name = message.name || '';
+    obj.description = message.description || '';
+    return obj;
+  },
+};
+
+export const GroupSuccessResponse = {
+  encode(message: GroupSuccessResponse, writer: Writer = Writer.create()): Writer {
+    writer.uint32(8).bool(message.success);
+    return writer;
+  },
+  decode(reader: Reader, length?: number): GroupSuccessResponse {
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = Object.create(baseGroupSuccessResponse) as GroupSuccessResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.success = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): GroupSuccessResponse {
+    const message = Object.create(baseGroupSuccessResponse) as GroupSuccessResponse;
+    if (object.success !== undefined && object.success !== null) {
+      message.success = Boolean(object.success);
+    } else {
+      message.success = false;
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<GroupSuccessResponse>): GroupSuccessResponse {
+    const message = Object.create(baseGroupSuccessResponse) as GroupSuccessResponse;
+    if (object.success !== undefined && object.success !== null) {
+      message.success = object.success;
+    } else {
+      message.success = false;
+    }
+    return message;
+  },
+  toJSON(message: GroupSuccessResponse): unknown {
+    const obj: any = {};
+    obj.success = message.success || false;
+    return obj;
+  },
+};
+
+export const ListGroupsRequest = {
+  encode(message: ListGroupsRequest, writer: Writer = Writer.create()): Writer {
+    return writer;
+  },
+  decode(reader: Reader, length?: number): ListGroupsRequest {
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = Object.create(baseListGroupsRequest) as ListGroupsRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): ListGroupsRequest {
+    const message = Object.create(baseListGroupsRequest) as ListGroupsRequest;
+    return message;
+  },
+  fromPartial(object: DeepPartial<ListGroupsRequest>): ListGroupsRequest {
+    const message = Object.create(baseListGroupsRequest) as ListGroupsRequest;
+    return message;
+  },
+  toJSON(message: ListGroupsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+};
+
+export const ListGroupsResponse = {
+  encode(message: ListGroupsResponse, writer: Writer = Writer.create()): Writer {
+    for (const v of message.groups) {
+      Group.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(reader: Reader, length?: number): ListGroupsResponse {
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = Object.create(baseListGroupsResponse) as ListGroupsResponse;
+    message.groups = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.groups.push(Group.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): ListGroupsResponse {
+    const message = Object.create(baseListGroupsResponse) as ListGroupsResponse;
+    message.groups = [];
+    if (object.groups !== undefined && object.groups !== null) {
+      for (const e of object.groups) {
+        message.groups.push(Group.fromJSON(e));
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ListGroupsResponse>): ListGroupsResponse {
+    const message = Object.create(baseListGroupsResponse) as ListGroupsResponse;
+    message.groups = [];
+    if (object.groups !== undefined && object.groups !== null) {
+      for (const e of object.groups) {
+        message.groups.push(Group.fromPartial(e));
+      }
+    }
+    return message;
+  },
+  toJSON(message: ListGroupsResponse): unknown {
+    const obj: any = {};
+    if (message.groups) {
+      obj.groups = message.groups.map(e => e ? Group.toJSON(e) : undefined);
+    } else {
+      obj.groups = [];
+    }
+    return obj;
+  },
+};
+
+export const GetGroupRequest = {
+  encode(message: GetGroupRequest, writer: Writer = Writer.create()): Writer {
+    writer.uint32(10).string(message.id);
+    return writer;
+  },
+  decode(reader: Reader, length?: number): GetGroupRequest {
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = Object.create(baseGetGroupRequest) as GetGroupRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): GetGroupRequest {
+    const message = Object.create(baseGetGroupRequest) as GetGroupRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id);
+    } else {
+      message.id = '';
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<GetGroupRequest>): GetGroupRequest {
+    const message = Object.create(baseGetGroupRequest) as GetGroupRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = '';
+    }
+    return message;
+  },
+  toJSON(message: GetGroupRequest): unknown {
+    const obj: any = {};
+    obj.id = message.id || '';
+    return obj;
+  },
+};
+
+export const CreateGroupRequest = {
+  encode(message: CreateGroupRequest, writer: Writer = Writer.create()): Writer {
+    if (message.group !== undefined && message.group !== undefined) {
+      Group.encode(message.group, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(reader: Reader, length?: number): CreateGroupRequest {
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = Object.create(baseCreateGroupRequest) as CreateGroupRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.group = Group.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): CreateGroupRequest {
+    const message = Object.create(baseCreateGroupRequest) as CreateGroupRequest;
+    if (object.group !== undefined && object.group !== null) {
+      message.group = Group.fromJSON(object.group);
+    } else {
+      message.group = undefined;
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<CreateGroupRequest>): CreateGroupRequest {
+    const message = Object.create(baseCreateGroupRequest) as CreateGroupRequest;
+    if (object.group !== undefined && object.group !== null) {
+      message.group = Group.fromPartial(object.group);
+    } else {
+      message.group = undefined;
+    }
+    return message;
+  },
+  toJSON(message: CreateGroupRequest): unknown {
+    const obj: any = {};
+    obj.group = message.group ? Group.toJSON(message.group) : undefined;
+    return obj;
+  },
+};
+
+export const UpdateGroupRequest = {
+  encode(message: UpdateGroupRequest, writer: Writer = Writer.create()): Writer {
+    if (message.group !== undefined && message.group !== undefined) {
+      Group.encode(message.group, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(reader: Reader, length?: number): UpdateGroupRequest {
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = Object.create(baseUpdateGroupRequest) as UpdateGroupRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.group = Group.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): UpdateGroupRequest {
+    const message = Object.create(baseUpdateGroupRequest) as UpdateGroupRequest;
+    if (object.group !== undefined && object.group !== null) {
+      message.group = Group.fromJSON(object.group);
+    } else {
+      message.group = undefined;
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<UpdateGroupRequest>): UpdateGroupRequest {
+    const message = Object.create(baseUpdateGroupRequest) as UpdateGroupRequest;
+    if (object.group !== undefined && object.group !== null) {
+      message.group = Group.fromPartial(object.group);
+    } else {
+      message.group = undefined;
+    }
+    return message;
+  },
+  toJSON(message: UpdateGroupRequest): unknown {
+    const obj: any = {};
+    obj.group = message.group ? Group.toJSON(message.group) : undefined;
+    return obj;
+  },
+};
+
+export const DeleteGroupRequest = {
+  encode(message: DeleteGroupRequest, writer: Writer = Writer.create()): Writer {
+    writer.uint32(10).string(message.id);
+    return writer;
+  },
+  decode(reader: Reader, length?: number): DeleteGroupRequest {
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = Object.create(baseDeleteGroupRequest) as DeleteGroupRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): DeleteGroupRequest {
+    const message = Object.create(baseDeleteGroupRequest) as DeleteGroupRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id);
+    } else {
+      message.id = '';
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<DeleteGroupRequest>): DeleteGroupRequest {
+    const message = Object.create(baseDeleteGroupRequest) as DeleteGroupRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = '';
+    }
+    return message;
+  },
+  toJSON(message: DeleteGroupRequest): unknown {
     const obj: any = {};
     obj.id = message.id || '';
     return obj;

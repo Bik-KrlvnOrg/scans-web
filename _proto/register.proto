@@ -19,7 +19,7 @@ service RegisterService {
 
 message Register {
     required string type = 1;
-    repeated Member members = 2;
+    required Group group = 2;
     required Sponsor sponsor = 3;
 }
 
@@ -35,8 +35,17 @@ message Member {
    required string email = 7;
    required string relationship = 8;
    required string residentialAddress = 9;
-   required Benefit benefit = 10;
-   required MedicalHistory medicalHistory = 11;
+   optional string rateId = 10;
+   optional string premiumId = 11;
+   repeated Medical medicals = 12;
+}
+
+message MemberGroup {
+   optional string id = 1;
+   required string principalId = 2;
+   required string premiumId = 3;
+   optional Group group = 4;
+   repeated Member members = 5;
 }
 
 message Sponsor {
@@ -45,9 +54,10 @@ message Sponsor {
    required string relationship = 3;
    required string contact = 4;
    required string email = 5;
-   required string password = 6;
+   optional string password = 6;
    required string residentialAddress = 7;
    required string postalAddress = 8;
+   repeated Member members = 9;
 }
 
 message Benefit {
@@ -107,3 +117,38 @@ message UpdateMedicalRequest { required Medical medical = 1;}
 message DeleteMedicalRequest { required string id = 1;}
 
 //endregion
+
+// region GROUP
+service GroupService {
+  rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse);
+
+  rpc GetGroup(GetGroupRequest) returns (Group);
+
+  rpc CreateGroup(CreateGroupRequest) returns (GroupSuccessResponse);
+
+  rpc UpdateGroup(UpdateGroupRequest) returns (GroupSuccessResponse);
+
+  rpc DeleteGroup(DeleteGroupRequest) returns (GroupSuccessResponse);
+}
+
+message Group {
+   optional string id = 1;
+   required string name = 2;
+   optional string description = 3;
+}
+
+message GroupSuccessResponse { required bool success = 1;}
+
+message ListGroupsRequest {}
+
+message ListGroupsResponse { repeated Group groups = 1;}
+
+message GetGroupRequest { required string id = 1;}
+
+message CreateGroupRequest { required Group group = 1;}
+
+message UpdateGroupRequest {required  Group group = 1;}
+
+message DeleteGroupRequest { required string id = 1;}
+
+//end region

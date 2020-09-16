@@ -20,8 +20,10 @@ export class CreateMembersHandler implements ICommandHandler<CreateMembersComman
         try {
             this.logger.log(`async ${this.constructor.name} ...`, command.constructor.name)
             const { cmd } = command
-            const entities = await this.memberRepository.createMember(cmd.register.members)
-            this.event$.publish(new MembersCreatedEvent(entities, cmd))
+            const entities = await this.memberRepository.createMember(cmd.sponsor.members)
+            const req = { ...cmd }
+            req.sponsor.members = entities
+            this.event$.publish(new MembersCreatedEvent(req))
             return { success: true }
         } catch (err) {
             this.logger.log(err)

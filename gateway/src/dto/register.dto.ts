@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsPhoneNumber, IsEmail, IsString, MinLength, ValidateNested, IsOptional, IsUUID, IsNumber } from "class-validator";
 import { Field, InputType, ID } from "@nestjs/graphql";
-import { Benefit, Medical, MedicalHistory, Member, Sponsor, Register } from '../_proto/register'
+import { Benefit, Medical, MedicalHistory, Member, Sponsor, Register, Group } from '../_proto/register'
 import { Type } from "class-transformer";
 
 
@@ -88,15 +88,16 @@ export class MemberDto implements Member {
     @IsNotEmpty()
     residentialAddress: string;
 
-    @Field(type => BenefitDto)
-    @ValidateNested({ each: true })
-    @Type(() => BenefitDto)
-    benefit: BenefitDto;
+    @Field()
+    rateId: string
 
-    @Field(type => MedicalHistoryDto)
+    @Field()
+    premiumId: string
+
+    @Field(type => [MedicalDto], { nullable: true })
     @ValidateNested({ each: true })
-    @Type(() => MedicalHistoryDto)
-    medicalHistory: MedicalHistoryDto;
+    @Type(() => MedicalDto)
+    medicals: MedicalDto[];
 }
 
 
@@ -134,6 +135,17 @@ export class SponsorDto implements Sponsor {
     @Field()
     @IsNotEmpty()
     postalAddress: string;
+
+    @Field()
+    rateId: string
+
+    @Field()
+    premiumId: string
+
+    @Field(() => [MemberDto])
+    @ValidateNested({ each: true })
+    @Type(() => MemberDto)
+    members: MemberDto[]
 }
 
 
@@ -155,15 +167,30 @@ export class MedicalDto implements Medical {
 }
 
 @InputType()
+export class GroupDto implements Group {
+    @Field({ nullable: true })
+    @IsOptional()
+    @IsUUID()
+    id: string;
+
+    @Field()
+    @IsNotEmpty()
+    name: string;
+
+    @Field({ nullable: true })
+    @IsOptional()
+    description: string;
+}
+@InputType()
 export class RegisterDto implements Register {
     @Field()
     @IsNotEmpty()
     type: string;
 
-    @Field(type => [MemberDto])
+    @Field(() => GroupDto)
     @ValidateNested({ each: true })
-    @Type(() => MemberDto)
-    members: MemberDto[];
+    @Type(() => GroupDto)
+    group: GroupDto
 
     @Field(type => SponsorDto)
     @ValidateNested({ each: true })

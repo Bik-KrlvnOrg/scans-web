@@ -3,19 +3,20 @@ import { MembershipService } from './membership.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MemberRepository } from './repository/member.repository';
 import { CqrsModule } from '@nestjs/cqrs';
-import { CreateMembersHandler } from './command';
+import { CreateMemberGroupHandler, CreateMembersHandler } from './command';
 import { MembershipController } from './membership.controller';
-import { MembersCreatedHandler } from './event';
+import { MemberGroupCreatedHandler, MembersCreatedHandler } from './event';
 import { SponsorModule } from '../sponsor/sponsor.module';
 import { MembershipSagas } from './saga/membership.sagas';
+import { MemberGroupRepository } from './repository';
 
-const CommandHandlers = [CreateMembersHandler]
-const EventHandlers = [MembersCreatedHandler]
+const CommandHandlers = [CreateMembersHandler, CreateMemberGroupHandler]
+const EventHandlers = [MembersCreatedHandler, MemberGroupCreatedHandler]
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([MemberRepository]),
+    TypeOrmModule.forFeature([MemberRepository, MemberGroupRepository]),
     SponsorModule
   ],
   providers: [

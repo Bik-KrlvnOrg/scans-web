@@ -9,6 +9,6 @@ export class MembershipController {
 
     @GrpcMethod('RegisterService', 'CreateRegister')
     async registerPolicy(req: CreateRegisterRequest) {
-        return this.membershipService.createMembership(req)
+        return this.membershipService.createMembership(req.register)
     }
 }

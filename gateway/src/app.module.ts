@@ -8,6 +8,7 @@ import { MembershipModule } from './membership/membership.module';
 import { ConfigModule } from '@nestjs/config'
 import { config } from './libs';
 import { BenefitModule } from './benefit/benefit.module';
+import { GroupsModule } from './groups/groups.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { BenefitModule } from './benefit/benefit.module';
     }),
     MedicalModule,
     MembershipModule,
-    BenefitModule
+    BenefitModule,
+    GroupsModule
   ],
   controllers: [AppController],
   providers: [AppService],

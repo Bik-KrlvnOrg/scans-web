@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config'
 import { MedicalModule } from './medical/medical.module';
 import { SponsorModule } from './sponsor/sponsor.module';
 import { config, PostgresDbConfig } from './libs/config';
+import { GroupsModule } from './groups/groups.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { config, PostgresDbConfig } from './libs/config';
     }),
     MembershipModule,
     MedicalModule,
-    SponsorModule
+    SponsorModule,
+    GroupsModule
   ],
   controllers: [AppController],
   providers: [AppService],

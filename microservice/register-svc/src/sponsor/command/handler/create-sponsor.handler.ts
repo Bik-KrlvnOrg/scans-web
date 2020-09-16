@@ -17,11 +17,13 @@ export class CreateSponsorHandler implements ICommandHandler<CreateSponsorComman
 
     async execute(command: CreateSponsorCommand): Promise<RegisterSuccessResponse> {
         this.logger.log(`async ${this.constructor.name}...`, command.constructor.name)
-        const { req, members } = command
+        const { req } = command
 
-        const data = { ...req.register.sponsor, members }
+        const data = req.sponsor
 
-        const result = await this.sponsorRepository.createSponsor(data)
+        const entity = await this.sponsorRepository.createSponsor(data)
+        const result = req
+        result.sponsor = entity
         this.event$.publish(new SponsorCreatedEvent(result))
         return { success: true }
     }

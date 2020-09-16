@@ -7,6 +7,6 @@ export class MembersCreatedHandler implements IEventHandler<MembersCreatedEvent>
     logger = new Logger(this.constructor.name)
 
     handle(event: MembersCreatedEvent): void {
-        this.logger.log(event.data, event.constructor.name)
+        this.logger.log(event, event.constructor.name)
     }
 }
