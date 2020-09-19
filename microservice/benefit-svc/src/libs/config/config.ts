@@ -3,17 +3,17 @@ import { join } from "path";
 
 export const config = () => ({
     database: {
-        name:'default',
+        name: 'default',
         type: 'postgres',
         database: process.env.DATABASE_DB,
         username: process.env.DATABASE_USER,
         password: process.env.DATABASE_PASSWORD,
         host: process.env.DATABASE_HOST,
         port: Number(process.env.DATABASE_PORT),
-        synchronize: true,
+        synchronize: JSON.parse(process.env.DATABASE_SYNC),
         entities: [__dirname + '/../../**/*.entity.{js,ts}'],
-        logging: process.env.DATABASE_LOG,
-        dropSchema: process.env.DATABASE_DROP_SCHEMA
+        logging: JSON.parse(process.env.DATABASE_LOG),
+        dropSchema: JSON.parse(process.env.DATABASE_DROP_SCHEMA)
     },
     benefitSVC: {
         transport: Transport.GRPC,
